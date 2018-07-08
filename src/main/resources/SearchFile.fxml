@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.StatusBar?>
+
+<BorderPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="jp.gr.java_conf.stardiopside.searchfile.javafx.controller.SearchFileCcontroller">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <menus>
+                <Menu text="ファイル(_F)">
+                    <items>
+                        <MenuItem text="アプリケーションの終了(_X)" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <bottom>
+        <StatusBar fx:id="statusBar" BorderPane.alignment="CENTER">
+            <rightItems>
+                <Separator orientation="VERTICAL" />
+                <Label fx:id="osName" text="os.name" />
+            </rightItems>
+        </StatusBar>
+    </bottom>
+    <center>
+        <ListView fx:id="foundFiles" prefHeight="500.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+    </center>
+    <right>
+        <VBox spacing="8.0" BorderPane.alignment="CENTER">
+            <children>
+                <VBox spacing="2.0">
+                    <children>
+                        <Label text="ディレクトリ名" />
+                        <TextField fx:id="textDirectory" />
+                    </children>
+                </VBox>
+                <HBox alignment="TOP_RIGHT">
+                    <children>
+                        <Button fx:id="buttonDirectory" onAction="#onChooseDirectory" text="ディレクトリの指定" />
+                    </children>
+                </HBox>
+                <VBox spacing="2.0">
+                    <children>
+                        <Label text="ファイル名" />
+                        <TextField fx:id="textFileName" />
+                    </children>
+                </VBox>
+                <GridPane hgap="16.0" vgap="8.0">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" percentWidth="50.0" />
+                        <ColumnConstraints halignment="LEFT" percentWidth="50.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                    </rowConstraints>
+                    <children>
+                        <RadioButton selected="true" text="ワイルドカード" userData="WILDCARD">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="searchType" />
+                            </toggleGroup>
+                        </RadioButton>
+                        <RadioButton text="正規表現" toggleGroup="$searchType" userData="REGEX"
+                            GridPane.columnIndex="1" />
+                        <Button fx:id="buttonSearch" defaultButton="true" maxWidth="1.7976931348623157E308"
+                            onAction="#onSearch" text="検索開始" GridPane.rowIndex="1" />
+                        <Button fx:id="buttonClearResults" maxWidth="1.7976931348623157E308"
+                            onAction="#onClearResults" text="リストのクリア" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    </children>
+                </GridPane>
+                <HBox alignment="TOP_CENTER">
+                    <children>
+                        <Button maxWidth="1.7976931348623157E308" onAction="#onCopyResults"
+                            text="検索結果をクリップボードにコピー" HBox.hgrow="ALWAYS" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="16.0" />
+                    </VBox.margin>
+                </HBox>
+                <HBox alignment="TOP_CENTER" spacing="8.0">
+                    <children>
+                        <Button onAction="#onSelectAll" text="すべて選択" />
+                        <Button onAction="#onClearSelection" text="選択解除" />
+                        <Button onAction="#onDeleteSelectedFile" text="選択ファイルを削除" />
+                    </children>
+                </HBox>
+                <HBox alignment="TOP_RIGHT">
+                    <children>
+                        <CheckBox text="削除時にファイルをごみ箱に移す" />
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+            </padding>
+        </VBox>
+    </right>
+</BorderPane>
