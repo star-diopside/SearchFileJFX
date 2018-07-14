@@ -1,5 +1,7 @@
 package jp.gr.java_conf.stardiopside.searchfile.javafx;
 
+import java.util.ResourceBundle;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,12 +17,13 @@ public class SearchFile extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("SearchFile.fxml"));
+        ResourceBundle messages = ResourceBundle.getBundle("messages");
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("SearchFile.fxml"), messages);
         Parent parent = loader.load();
         SearchFileCcontroller controller = loader.getController();
         controller.setStage(primaryStage);
         primaryStage.setScene(new Scene(parent));
-        primaryStage.setTitle("ファイルの検索");
+        primaryStage.setTitle(messages.getString("SearchFile.title"));
         primaryStage.show();
     }
 }

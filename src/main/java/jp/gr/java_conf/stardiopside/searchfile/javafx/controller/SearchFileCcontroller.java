@@ -1,14 +1,18 @@
 package jp.gr.java_conf.stardiopside.searchfile.javafx.controller;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import org.controlsfx.control.StatusBar;
 
@@ -22,6 +26,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -35,6 +40,7 @@ import jp.gr.java_conf.stardiopside.searchfile.javafx.util.PathStringConverter;
 public class SearchFileCcontroller implements Initializable {
 
     private static final Logger logger = Logger.getLogger(SearchFileCcontroller.class.getName());
+    private ResourceBundle messages;
     private Condition condition = new Condition();
     private Searcher searcher = new Searcher();
     private StringProperty statusProperty = new SimpleStringProperty();
@@ -79,6 +85,8 @@ public class SearchFileCcontroller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.messages = resources;
+
         Bindings.bindBidirectional(textDirectory.textProperty(), condition.directoryProperty(),
                 new PathStringConverter());
         condition.filePatternProperty().bind(textFileName.textProperty());
@@ -118,12 +126,12 @@ public class SearchFileCcontroller implements Initializable {
             logger.log(Level.FINE, exc.getMessage(), exc);
             Alert alert = new Alert(AlertType.WARNING);
             alert.setHeaderText(null);
-            alert.setContentText("検索ディレクトリが存在しません。検索条件を見直してください。");
+            alert.setContentText(messages.getString("message.directoryNotFound"));
             alert.showAndWait();
         } catch (PatternSyntaxException exc) {
             logger.log(Level.FINE, exc.getMessage(), exc);
             Alert alert = new Alert(AlertType.WARNING);
-            alert.setHeaderText("ファイル検索パターンに誤りがあります。検索条件を見直してください。");
+            alert.setHeaderText(messages.getString("message.searchConditionError"));
             alert.setContentText(exc.getMessage());
             alert.showAndWait();
         }
@@ -132,18 +140,25 @@ public class SearchFileCcontroller implements Initializable {
     private void changedSearchingDirectory(ObservableValue<? extends Path> observable, Path oldValue, Path newValue) {
         if (newValue == null) {
             if (searcher.getResults().isEmpty()) {
-                statusProperty.set("ファイルが見つかりませんでした。");
+                statusProperty.set(messages.getString("message.searchResult.empty"));
             } else {
-                statusProperty.set(searcher.getResults().size() + " 個のファイルが見つかりました。");
+                statusProperty.set(MessageFormat.format(messages.getString("message.searchResult.found"),
+                        searcher.getResults().size()));
             }
         } else {
-            statusProperty.set(newValue.toString() + " を検索中...");
+            statusProperty.set(MessageFormat.format(messages.getString("message.searchingDirectory"), newValue));
         }
     }
 
     @FXML
     private void onClearResults(ActionEvent e) {
-        searcher.clear();
+        Alert alert = new Alert(AlertType.CONFIRMATION, messages.getString("message.clearResultConfirmation"),
+                ButtonType.OK, ButtonType.CANCEL);
+        alert.setHeaderText(null);
+        alert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> {
+            searcher.clear();
+            statusProperty.set(messages.getString("message.clearResults"));
+        });
     }
 
     @FXML
@@ -163,6 +178,11 @@ public class SearchFileCcontroller implements Initializable {
 
     @FXML
     private void onCopyResults(ActionEvent e) {
-        logger.info(e.toString());
+        String result = searcher.getResults().stream().map(Path::toString)
+                .collect(Collectors.joining(System.lineSeparator(), "", System.lineSeparator()));
+        StringSelection selection = new StringSelection(result);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
+        statusProperty
+                .set(MessageFormat.format(messages.getString("message.copyResults"), searcher.getResults().size()));
     }
 }
