@@ -1,5 +1,6 @@
 package jp.gr.java_conf.stardiopside.searchfile.javafx.model;
 
+import java.awt.Desktop;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -9,6 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -123,6 +128,7 @@ public class Searcher implements AutoCloseable {
                 Platform.runLater(() -> setSearchingDirectory(null));
             }
         }, null) {
+            @Override
             protected void done() {
                 Platform.runLater(() -> setSearching(false));
             };
@@ -135,5 +141,58 @@ public class Searcher implements AutoCloseable {
 
     public void clear() {
         results.clear();
+    }
+
+    public RemoveResult moveToTrash(Collection<Path> files) {
+        ArrayList<Path> deletedFiles = new ArrayList<>();
+        ArrayList<Path> errorFiles = new ArrayList<>();
+
+        Desktop desktop = Desktop.getDesktop();
+        files.forEach(file -> {
+            if (desktop.moveToTrash(file.toFile())) {
+                deletedFiles.add(file);
+            } else {
+                errorFiles.add(file);
+            }
+        });
+
+        results.removeAll(deletedFiles);
+        return new RemoveResult(deletedFiles, errorFiles);
+    }
+
+    public RemoveResult delete(Collection<Path> files) {
+        ArrayList<Path> deletedFiles = new ArrayList<>();
+        ArrayList<Path> errorFiles = new ArrayList<>();
+
+        files.forEach(file -> {
+            try {
+                Files.delete(file);
+                deletedFiles.add(file);
+            } catch (IOException ex) {
+                logger.log(Level.WARNING, ex.getMessage(), ex);
+                errorFiles.add(file);
+            }
+        });
+
+        results.removeAll(deletedFiles);
+        return new RemoveResult(deletedFiles, errorFiles);
+    }
+
+    public static class RemoveResult {
+        private List<Path> deletedFiles;
+        private List<Path> errorFiles;
+
+        private RemoveResult(List<Path> deletedFiles, List<Path> errorFiles) {
+            this.deletedFiles = Collections.unmodifiableList(deletedFiles);
+            this.errorFiles = Collections.unmodifiableList(errorFiles);
+        }
+
+        public List<Path> getDeletedFiles() {
+            return deletedFiles;
+        }
+
+        public List<Path> getErrorFiles() {
+            return errorFiles;
+        }
     }
 }

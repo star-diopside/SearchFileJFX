@@ -27,14 +27,17 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import jp.gr.java_conf.stardiopside.searchfile.javafx.model.Condition;
 import jp.gr.java_conf.stardiopside.searchfile.javafx.model.Searcher;
+import jp.gr.java_conf.stardiopside.searchfile.javafx.model.Searcher.RemoveResult;
 import jp.gr.java_conf.stardiopside.searchfile.javafx.util.PathStringConverter;
 
 public class SearchFileCcontroller implements Initializable {
@@ -66,6 +69,9 @@ public class SearchFileCcontroller implements Initializable {
     private Button buttonClearResults;
 
     @FXML
+    private CheckBox checkMoveToTrash;
+
+    @FXML
     private ListView<Path> foundFiles;
 
     @FXML
@@ -91,6 +97,7 @@ public class SearchFileCcontroller implements Initializable {
                 new PathStringConverter());
         condition.filePatternProperty().bind(textFileName.textProperty());
         condition.matchTypeProperty().bind(searchType.selectedToggleProperty());
+        foundFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         foundFiles.setItems(searcher.getResults());
         buttonDirectory.defaultButtonProperty().bind(textDirectory.focusedProperty());
         buttonSearch.textProperty().bind(Bindings.createStringBinding(() -> messages.getString(
@@ -169,17 +176,37 @@ public class SearchFileCcontroller implements Initializable {
 
     @FXML
     private void onSelectAll(ActionEvent e) {
-        logger.info(e.toString());
+        foundFiles.getSelectionModel().selectAll();
     }
 
     @FXML
     private void onClearSelection(ActionEvent e) {
-        logger.info(e.toString());
+        foundFiles.getSelectionModel().clearSelection();
     }
 
     @FXML
     private void onDeleteSelectedFile(ActionEvent e) {
-        logger.info(e.toString());
+        String messageKey = checkMoveToTrash.isSelected() ? "message.deleteSelectedFileConfirmation.moveToTrash"
+                : "message.deleteSelectedFileConfirmation.delete";
+        Alert alert = new Alert(AlertType.CONFIRMATION, messages.getString(messageKey), ButtonType.OK,
+                ButtonType.CANCEL);
+        alert.setHeaderText(null);
+        alert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> {
+            RemoveResult result;
+            if (checkMoveToTrash.isSelected()) {
+                result = searcher.moveToTrash(foundFiles.getSelectionModel().getSelectedItems());
+            } else {
+                result = searcher.delete(foundFiles.getSelectionModel().getSelectedItems());
+            }
+
+            String resultMessage = MessageFormat.format(messages.getString("message.deleteSelectedFile.success"),
+                    result.getDeletedFiles().size());
+            if (!result.getErrorFiles().isEmpty()) {
+                resultMessage += MessageFormat.format(messages.getString("message.deleteSelectedFile.error"),
+                        result.getErrorFiles().size());
+            }
+            statusProperty.set(resultMessage);
+        });
     }
 
     @FXML

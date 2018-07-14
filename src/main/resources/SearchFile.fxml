@@ -108,7 +108,8 @@
                 </HBox>
                 <HBox alignment="TOP_RIGHT">
                     <children>
-                        <CheckBox text="%SearchFile.checkMoveToTrash.text" />
+                        <CheckBox fx:id="checkMoveToTrash" selected="true"
+                            text="%SearchFile.checkMoveToTrash.text" />
                     </children>
                 </HBox>
             </children>
