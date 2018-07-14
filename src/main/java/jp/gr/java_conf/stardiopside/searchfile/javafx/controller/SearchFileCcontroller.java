@@ -93,13 +93,19 @@ public class SearchFileCcontroller implements Initializable {
         condition.matchTypeProperty().bind(searchType.selectedToggleProperty());
         foundFiles.setItems(searcher.getResults());
         buttonDirectory.defaultButtonProperty().bind(textDirectory.focusedProperty());
-        buttonSearch.textProperty().bind(Bindings.createStringBinding(() -> searcher.isSearching() ? "検索中止" : "検索開始",
+        buttonSearch.textProperty().bind(Bindings.createStringBinding(() -> messages.getString(
+                searcher.isSearching() ? "SearchFile.buttonSearch.text.stop" : "SearchFile.buttonSearch.text.start"),
                 searcher.searchingProperty()));
         buttonSearch.defaultButtonProperty().bind(textDirectory.focusedProperty().not());
         buttonClearResults.disableProperty().bind(searcher.searchingProperty());
         statusBar.textProperty().bind(statusProperty);
         searcher.searchingDirectoryProperty().addListener(this::changedSearchingDirectory);
         osName.setText(System.getProperty("os.name"));
+    }
+
+    @FXML
+    private void onApplicationExit(ActionEvent e) {
+        stage.close();
     }
 
     @FXML
@@ -152,7 +158,7 @@ public class SearchFileCcontroller implements Initializable {
 
     @FXML
     private void onClearResults(ActionEvent e) {
-        Alert alert = new Alert(AlertType.CONFIRMATION, messages.getString("message.clearResultConfirmation"),
+        Alert alert = new Alert(AlertType.CONFIRMATION, messages.getString("message.clearResultsConfirmation"),
                 ButtonType.OK, ButtonType.CANCEL);
         alert.setHeaderText(null);
         alert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> {

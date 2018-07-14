@@ -25,9 +25,9 @@
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <menus>
-                <Menu text="ファイル(_F)">
+                <Menu text="%SearchFile.menuFile.text">
                     <items>
-                        <MenuItem text="アプリケーションの終了(_X)" />
+                        <MenuItem onAction="#onApplicationExit" text="%SearchFile.menuFileExit.text" />
                     </items>
                 </Menu>
             </menus>
@@ -49,18 +49,19 @@
             <children>
                 <VBox spacing="2.0">
                     <children>
-                        <Label text="ディレクトリ名" />
+                        <Label text="%SearchFile.labelDirectory.text" />
                         <TextField fx:id="textDirectory" />
                     </children>
                 </VBox>
                 <HBox alignment="TOP_RIGHT">
                     <children>
-                        <Button fx:id="buttonDirectory" onAction="#onChooseDirectory" text="ディレクトリの指定" />
+                        <Button fx:id="buttonDirectory" onAction="#onChooseDirectory"
+                            text="%SearchFile.buttonDirectory.text" />
                     </children>
                 </HBox>
                 <VBox spacing="2.0">
                     <children>
-                        <Label text="ファイル名" />
+                        <Label text="%SearchFile.labelFile.text" />
                         <TextField fx:id="textFileName" />
                     </children>
                 </VBox>
@@ -74,23 +75,25 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" />
                     </rowConstraints>
                     <children>
-                        <RadioButton selected="true" text="ワイルドカード" userData="WILDCARD">
+                        <RadioButton selected="true" text="%SearchFile.radioWildcard.text"
+                            userData="WILDCARD">
                             <toggleGroup>
                                 <ToggleGroup fx:id="searchType" />
                             </toggleGroup>
                         </RadioButton>
-                        <RadioButton text="正規表現" toggleGroup="$searchType" userData="REGEX"
-                            GridPane.columnIndex="1" />
+                        <RadioButton text="%SearchFile.radioRegex.text" toggleGroup="$searchType"
+                            userData="REGEX" GridPane.columnIndex="1" />
                         <Button fx:id="buttonSearch" defaultButton="true" maxWidth="1.7976931348623157E308"
-                            onAction="#onSearch" text="検索開始" GridPane.rowIndex="1" />
+                            onAction="#onSearch" text="%SearchFile.buttonSearch.text.start" GridPane.rowIndex="1" />
                         <Button fx:id="buttonClearResults" maxWidth="1.7976931348623157E308"
-                            onAction="#onClearResults" text="リストのクリア" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            onAction="#onClearResults" text="%SearchFile.buttonClearResults.text"
+                            GridPane.columnIndex="1" GridPane.rowIndex="1" />
                     </children>
                 </GridPane>
                 <HBox alignment="TOP_CENTER">
                     <children>
                         <Button maxWidth="1.7976931348623157E308" onAction="#onCopyResults"
-                            text="検索結果をクリップボードにコピー" HBox.hgrow="ALWAYS" />
+                            text="%SearchFile.buttonCopyResults.text" HBox.hgrow="ALWAYS" />
                     </children>
                     <VBox.margin>
                         <Insets top="16.0" />
@@ -98,14 +101,14 @@
                 </HBox>
                 <HBox alignment="TOP_CENTER" spacing="8.0">
                     <children>
-                        <Button onAction="#onSelectAll" text="すべて選択" />
-                        <Button onAction="#onClearSelection" text="選択解除" />
-                        <Button onAction="#onDeleteSelectedFile" text="選択ファイルを削除" />
+                        <Button onAction="#onSelectAll" text="%SearchFile.buttonSelectAll.text" />
+                        <Button onAction="#onClearSelection" text="%SearchFile.buttonClearSelection.text" />
+                        <Button onAction="#onDeleteSelectedFile" text="%SearchFile.buttonDeleteSelectedFile.text" />
                     </children>
                 </HBox>
                 <HBox alignment="TOP_RIGHT">
                     <children>
-                        <CheckBox text="削除時にファイルをごみ箱に移す" />
+                        <CheckBox text="%SearchFile.checkMoveToTrash.text" />
                     </children>
                 </HBox>
             </children>
