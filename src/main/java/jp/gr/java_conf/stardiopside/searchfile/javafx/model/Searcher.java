@@ -22,12 +22,10 @@ import java.util.logging.Logger;
 import java.util.regex.PatternSyntaxException;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -36,17 +34,22 @@ public class Searcher implements AutoCloseable {
     private static final Logger logger = Logger.getLogger(Searcher.class.getName());
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private ObservableList<Path> results = FXCollections.observableArrayList();
-    private ObservableList<Path> readOnlyResults = FXCollections.unmodifiableObservableList(results);
-    private BooleanProperty searching = new SimpleBooleanProperty();
-    private ObjectProperty<Path> searchingDirectory = new SimpleObjectProperty<>();
+    private ReadOnlyObjectWrapper<ObservableList<Path>> readOnlyResults = new ReadOnlyObjectWrapper<>(
+            FXCollections.unmodifiableObservableList(results));
+    private ReadOnlyBooleanWrapper searching = new ReadOnlyBooleanWrapper();
+    private ReadOnlyObjectWrapper<Path> searchingDirectory = new ReadOnlyObjectWrapper<>();
     private volatile boolean isCancelled = false;
 
+    public ReadOnlyObjectProperty<ObservableList<Path>> resultsProperty() {
+        return readOnlyResults.getReadOnlyProperty();
+    }
+
     public ObservableList<Path> getResults() {
-        return readOnlyResults;
+        return readOnlyResults.get();
     }
 
     public ReadOnlyBooleanProperty searchingProperty() {
-        return searching;
+        return searching.getReadOnlyProperty();
     }
 
     public boolean isSearching() {
@@ -58,7 +61,7 @@ public class Searcher implements AutoCloseable {
     }
 
     public ReadOnlyObjectProperty<Path> searchingDirectoryProperty() {
-        return searchingDirectory;
+        return searchingDirectory.getReadOnlyProperty();
     }
 
     public Path getSearchingDirectory() {

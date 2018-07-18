@@ -98,7 +98,7 @@ public class SearchFileCcontroller implements Initializable {
         condition.filePatternProperty().bind(textFileName.textProperty());
         condition.matchTypeProperty().bind(searchType.selectedToggleProperty());
         foundFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        foundFiles.setItems(searcher.getResults());
+        foundFiles.itemsProperty().bind(searcher.resultsProperty());
         buttonDirectory.defaultButtonProperty().bind(textDirectory.focusedProperty());
         buttonSearch.textProperty().bind(Bindings.createStringBinding(() -> messages.getString(
                 searcher.isSearching() ? "SearchFile.buttonSearch.text.stop" : "SearchFile.buttonSearch.text.start"),
