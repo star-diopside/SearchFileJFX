@@ -15,6 +15,9 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.controlsfx.control.StatusBar;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
@@ -40,12 +43,14 @@ import jp.gr.java_conf.stardiopside.searchfile.javafx.model.Searcher;
 import jp.gr.java_conf.stardiopside.searchfile.javafx.model.Searcher.RemoveResult;
 import jp.gr.java_conf.stardiopside.searchfile.javafx.util.PathStringConverter;
 
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SearchFileCcontroller implements Initializable {
 
     private static final Logger logger = Logger.getLogger(SearchFileCcontroller.class.getName());
+    private final Condition condition;
+    private final Searcher searcher;
     private ResourceBundle messages;
-    private Condition condition = new Condition();
-    private Searcher searcher = new Searcher();
     private StringProperty statusProperty = new SimpleStringProperty();
 
     private Stage stage;
@@ -79,6 +84,11 @@ public class SearchFileCcontroller implements Initializable {
 
     @FXML
     private Label osName;
+
+    public SearchFileCcontroller(Condition condition, Searcher searcher) {
+        this.condition = condition;
+        this.searcher = searcher;
+    }
 
     public void setStage(Stage stage) {
         this.stage = stage;

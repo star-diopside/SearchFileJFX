@@ -1,7 +1,9 @@
 plugins {
     id "org.springframework.boot" version "2.0.3.RELEASE"
-    id "java-library"
 }
+
+apply plugin: "java-library"
+apply plugin: "io.spring.dependency-management"
 
 group = "jp.gr.java_conf.stardiopside.searchfile.javafx"
 
@@ -14,5 +16,6 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
+    implementation "org.springframework.boot:spring-boot-starter"
     implementation "org.controlsfx:controlsfx:9.0.0"
 }
