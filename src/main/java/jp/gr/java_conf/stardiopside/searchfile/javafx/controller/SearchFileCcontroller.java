@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,13 +17,16 @@ import java.util.stream.Collectors;
 
 import org.controlsfx.control.StatusBar;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -52,8 +54,8 @@ public class SearchFileCcontroller implements Initializable {
     private static final Logger logger = Logger.getLogger(SearchFileCcontroller.class.getName());
     private final Condition condition;
     private final Searcher searcher;
-    private ResourceBundle messages;
-    private StringProperty statusProperty = new SimpleStringProperty();
+    private final MessageSourceAccessor messages;
+    private final StringProperty statusProperty = new SimpleStringProperty();
 
     private Stage stage;
 
@@ -87,9 +89,10 @@ public class SearchFileCcontroller implements Initializable {
     @FXML
     private Label osName;
 
-    public SearchFileCcontroller(Condition condition, Searcher searcher) {
+    public SearchFileCcontroller(Condition condition, Searcher searcher, MessageSource messageSource) {
         this.condition = condition;
         this.searcher = searcher;
+        this.messages = new MessageSourceAccessor(messageSource);
     }
 
     public void setStage(Stage stage) {
@@ -103,8 +106,6 @@ public class SearchFileCcontroller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.messages = resources;
-
         Bindings.bindBidirectional(textDirectory.textProperty(), condition.directoryProperty(),
                 new PathStringConverter());
         condition.filePatternProperty().bind(textFileName.textProperty());
@@ -112,7 +113,7 @@ public class SearchFileCcontroller implements Initializable {
         foundFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         foundFiles.itemsProperty().bind(searcher.resultsProperty());
         buttonDirectory.defaultButtonProperty().bind(textDirectory.focusedProperty());
-        buttonSearch.textProperty().bind(Bindings.createStringBinding(() -> messages.getString(
+        buttonSearch.textProperty().bind(Bindings.createStringBinding(() -> messages.getMessage(
                 searcher.isSearching() ? "SearchFile.buttonSearch.text.stop" : "SearchFile.buttonSearch.text.start"),
                 searcher.searchingProperty()));
         buttonSearch.defaultButtonProperty().bind(textDirectory.focusedProperty().not());
@@ -156,12 +157,12 @@ public class SearchFileCcontroller implements Initializable {
             logger.log(Level.FINE, exc.getMessage(), exc);
             Alert alert = new Alert(AlertType.WARNING);
             alert.setHeaderText(null);
-            alert.setContentText(messages.getString("message.directoryNotFound"));
+            alert.setContentText(messages.getMessage("message.directoryNotFound"));
             alert.showAndWait();
         } catch (PatternSyntaxException exc) {
             logger.log(Level.FINE, exc.getMessage(), exc);
             Alert alert = new Alert(AlertType.WARNING);
-            alert.setHeaderText(messages.getString("message.searchConditionError"));
+            alert.setHeaderText(messages.getMessage("message.searchConditionError"));
             alert.setContentText(exc.getMessage());
             alert.showAndWait();
         }
@@ -169,23 +170,23 @@ public class SearchFileCcontroller implements Initializable {
 
     private void changedSearchingDirectory(ObservableValue<? extends Path> observable, Path oldValue, Path newValue) {
         if (newValue != null) {
-            statusProperty.set(MessageFormat.format(messages.getString("message.searchingDirectory"), newValue));
+            statusProperty.set(messages.getMessage("message.searchingDirectory", new Object[] { newValue }));
         } else if (searcher.getResults().isEmpty()) {
-            statusProperty.set(messages.getString("message.searchResult.empty"));
+            statusProperty.set(messages.getMessage("message.searchResult.empty"));
         } else {
-            statusProperty.set(MessageFormat.format(messages.getString("message.searchResult.found"),
-                    searcher.getResults().size()));
+            statusProperty.set(
+                    messages.getMessage("message.searchResult.found", new Object[] { searcher.getResults().size() }));
         }
     }
 
     @FXML
     private void onClearResults(ActionEvent e) {
-        Alert alert = new Alert(AlertType.CONFIRMATION, messages.getString("message.clearResultsConfirmation"),
+        Alert alert = new Alert(AlertType.CONFIRMATION, messages.getMessage("message.clearResultsConfirmation"),
                 ButtonType.OK, ButtonType.CANCEL);
         alert.setHeaderText(null);
         alert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> {
             searcher.clear();
-            statusProperty.set(messages.getString("message.clearResults"));
+            statusProperty.set(messages.getMessage("message.clearResults"));
         });
     }
 
@@ -203,22 +204,24 @@ public class SearchFileCcontroller implements Initializable {
     private void onDeleteSelectedFile(ActionEvent e) {
         String messageKey = checkMoveToTrash.isSelected() ? "message.deleteSelectedFileConfirmation.moveToTrash"
                 : "message.deleteSelectedFileConfirmation.delete";
-        Alert alert = new Alert(AlertType.CONFIRMATION, messages.getString(messageKey), ButtonType.OK,
+        ObservableList<Path> selectedFiles = foundFiles.getSelectionModel().getSelectedItems();
+        Alert alert = new Alert(AlertType.CONFIRMATION,
+                messages.getMessage(messageKey, new Object[] { selectedFiles.size() }), ButtonType.OK,
                 ButtonType.CANCEL);
         alert.setHeaderText(null);
         alert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> {
             RemoveResult result;
             if (checkMoveToTrash.isSelected()) {
-                result = searcher.moveToTrash(foundFiles.getSelectionModel().getSelectedItems());
+                result = searcher.moveToTrash(selectedFiles);
             } else {
-                result = searcher.delete(foundFiles.getSelectionModel().getSelectedItems());
+                result = searcher.delete(selectedFiles);
             }
 
-            String resultMessage = MessageFormat.format(messages.getString("message.deleteSelectedFile.success"),
-                    result.getDeletedFiles().size());
+            String resultMessage = messages.getMessage("message.deleteSelectedFile.success",
+                    new Object[] { result.getDeletedFiles().size() });
             if (!result.getErrorFiles().isEmpty()) {
-                resultMessage += MessageFormat.format(messages.getString("message.deleteSelectedFile.error"),
-                        result.getErrorFiles().size());
+                resultMessage += messages.getMessage("message.deleteSelectedFile.error",
+                        new Object[] { result.getErrorFiles().size() });
             }
             statusProperty.set(resultMessage);
         });
@@ -230,7 +233,6 @@ public class SearchFileCcontroller implements Initializable {
                 .collect(Collectors.joining(System.lineSeparator(), "", System.lineSeparator()));
         StringSelection selection = new StringSelection(result);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
-        statusProperty
-                .set(MessageFormat.format(messages.getString("message.copyResults"), searcher.getResults().size()));
+        statusProperty.set(messages.getMessage("message.copyResults", new Object[] { searcher.getResults().size() }));
     }
 }
