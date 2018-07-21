@@ -45,7 +45,7 @@
         <ListView fx:id="foundFiles" prefHeight="500.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
     </center>
     <right>
-        <VBox spacing="8.0" BorderPane.alignment="CENTER">
+        <VBox prefWidth="256.0" spacing="8.0" BorderPane.alignment="CENTER">
             <children>
                 <VBox spacing="2.0">
                     <children>
@@ -99,13 +99,28 @@
                         <Insets top="16.0" />
                     </VBox.margin>
                 </HBox>
-                <HBox alignment="TOP_CENTER" spacing="8.0">
+                <GridPane hgap="16.0" vgap="8.0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50.0" />
+                        <ColumnConstraints percentWidth="50.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                    </rowConstraints>
                     <children>
-                        <Button onAction="#onSelectAll" text="%SearchFile.buttonSelectAll.text" />
-                        <Button onAction="#onClearSelection" text="%SearchFile.buttonClearSelection.text" />
-                        <Button onAction="#onDeleteSelectedFile" text="%SearchFile.buttonDeleteSelectedFile.text" />
+                        <Button maxWidth="1.7976931348623157E308" onAction="#onSelectAll"
+                            text="%SearchFile.buttonSelectAll.text" />
+                        <Button maxWidth="1.7976931348623157E308" onAction="#onClearSelection"
+                            text="%SearchFile.buttonClearSelection.text" GridPane.columnIndex="1" />
+                        <Button maxWidth="1.7976931348623157E308" onAction="#onDeleteSelectedFile"
+                            text="%SearchFile.buttonDeleteSelectedFile.text" GridPane.columnSpan="2"
+                            GridPane.rowIndex="1" />
                     </children>
-                </HBox>
+                    <VBox.margin>
+                        <Insets top="16.0" />
+                    </VBox.margin>
+                </GridPane>
                 <HBox alignment="TOP_RIGHT">
                     <children>
                         <CheckBox fx:id="checkMoveToTrash" selected="true"
