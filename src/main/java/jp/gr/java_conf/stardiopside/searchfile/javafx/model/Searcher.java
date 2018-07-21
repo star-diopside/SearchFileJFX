@@ -157,7 +157,7 @@ public class Searcher implements AutoCloseable {
         ArrayList<Path> errorFiles = new ArrayList<>();
 
         Desktop desktop = Desktop.getDesktop();
-        files.forEach(file -> {
+        files.stream().filter(results::contains).forEach(file -> {
             if (desktop.moveToTrash(file.toFile())) {
                 deletedFiles.add(file);
             } else {
@@ -173,7 +173,7 @@ public class Searcher implements AutoCloseable {
         ArrayList<Path> deletedFiles = new ArrayList<>();
         ArrayList<Path> errorFiles = new ArrayList<>();
 
-        files.forEach(file -> {
+        files.stream().filter(results::contains).forEach(file -> {
             try {
                 Files.delete(file);
                 deletedFiles.add(file);

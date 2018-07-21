@@ -1,5 +1,7 @@
 package jp.gr.java_conf.stardiopside.searchfile.javafx.controller;
 
+import java.awt.Desktop;
+import java.awt.Desktop.Action;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
@@ -118,6 +120,11 @@ public class SearchFileCcontroller implements Initializable {
         statusBar.textProperty().bind(statusProperty);
         searcher.searchingDirectoryProperty().addListener(this::changedSearchingDirectory);
         osName.setText(System.getProperty("os.name"));
+
+        if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Action.MOVE_TO_TRASH)) {
+            checkMoveToTrash.setSelected(false);
+            checkMoveToTrash.setVisible(false);
+        }
     }
 
     @FXML
@@ -161,15 +168,13 @@ public class SearchFileCcontroller implements Initializable {
     }
 
     private void changedSearchingDirectory(ObservableValue<? extends Path> observable, Path oldValue, Path newValue) {
-        if (newValue == null) {
-            if (searcher.getResults().isEmpty()) {
-                statusProperty.set(messages.getString("message.searchResult.empty"));
-            } else {
-                statusProperty.set(MessageFormat.format(messages.getString("message.searchResult.found"),
-                        searcher.getResults().size()));
-            }
-        } else {
+        if (newValue != null) {
             statusProperty.set(MessageFormat.format(messages.getString("message.searchingDirectory"), newValue));
+        } else if (searcher.getResults().isEmpty()) {
+            statusProperty.set(messages.getString("message.searchResult.empty"));
+        } else {
+            statusProperty.set(MessageFormat.format(messages.getString("message.searchResult.found"),
+                    searcher.getResults().size()));
         }
     }
 
