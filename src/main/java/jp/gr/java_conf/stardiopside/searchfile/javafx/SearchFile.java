@@ -1,7 +1,10 @@
 package jp.gr.java_conf.stardiopside.searchfile.javafx;
 
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -16,6 +19,7 @@ import jp.gr.java_conf.stardiopside.searchfile.javafx.controller.SearchFileCcont
 @SpringBootApplication
 public class SearchFile extends Application {
 
+    private static final Logger logger = Logger.getLogger(SearchFile.class.getName());
     private ConfigurableApplicationContext applicationContext;
 
     public static void main(String[] args) {
@@ -31,6 +35,14 @@ public class SearchFile extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         ResourceBundle messages = ResourceBundle.getBundle("messages");
+
+        Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            ExceptionDialog dialog = new ExceptionDialog(e);
+            dialog.setHeaderText(messages.getString("message.uncaughtException"));
+            dialog.show();
+        });
+
         FXMLLoader loader = new FXMLLoader(applicationContext.getResource("classpath:SearchFile.fxml").getURL(),
                 messages);
         loader.setControllerFactory(applicationContext::getBean);

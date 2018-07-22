@@ -133,6 +133,9 @@ public class Searcher implements AutoCloseable {
             } catch (IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
                 throw new UncheckedIOException(e);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, e.getMessage(), e);
+                throw e;
             } finally {
                 Platform.runLater(() -> setSearchingDirectory(null));
             }
