@@ -141,7 +141,7 @@ public class SearchFileCcontroller implements Initializable {
     private void onChooseDirectory(ActionEvent e) {
         var chooser = new DirectoryChooser();
         if (condition.getDirectory() != null && Files.isDirectory(condition.getDirectory())) {
-            chooser.setInitialDirectory(condition.getDirectory().toFile());
+            chooser.setInitialDirectory(condition.getDirectory().toAbsolutePath().toFile());
         }
         var dir = chooser.showDialog(stage);
         if (dir != null) {
