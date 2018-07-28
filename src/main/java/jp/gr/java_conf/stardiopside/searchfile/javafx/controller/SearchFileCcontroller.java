@@ -69,7 +69,7 @@ public class SearchFileCcontroller implements Initializable {
     private TextField textFileName;
 
     @FXML
-    private ToggleGroup searchType;
+    private ToggleGroup matchType;
 
     @FXML
     private Button buttonSearch;
@@ -109,7 +109,7 @@ public class SearchFileCcontroller implements Initializable {
         Bindings.bindBidirectional(textDirectory.textProperty(), condition.directoryProperty(),
                 new PathStringConverter());
         condition.filePatternProperty().bind(textFileName.textProperty());
-        condition.matchTypeProperty().bind(searchType.selectedToggleProperty());
+        condition.matchTypeProperty().bind(matchType.selectedToggleProperty());
         foundFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         foundFiles.itemsProperty().bind(searcher.resultsProperty());
         buttonDirectory.defaultButtonProperty().bind(textDirectory.focusedProperty());

@@ -78,10 +78,10 @@
                         <RadioButton selected="true" text="%SearchFile.radioWildcard.text"
                             userData="WILDCARD">
                             <toggleGroup>
-                                <ToggleGroup fx:id="searchType" />
+                                <ToggleGroup fx:id="matchType" />
                             </toggleGroup>
                         </RadioButton>
-                        <RadioButton text="%SearchFile.radioRegex.text" toggleGroup="$searchType"
+                        <RadioButton text="%SearchFile.radioRegex.text" toggleGroup="$matchType"
                             userData="REGEX" GridPane.columnIndex="1" />
                         <Button fx:id="buttonSearch" defaultButton="true" maxWidth="1.7976931348623157E308"
                             onAction="#onSearch" text="%SearchFile.buttonSearch.text.start" GridPane.rowIndex="1" />

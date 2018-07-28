@@ -44,7 +44,7 @@ public class Searcher implements AutoCloseable {
             FXCollections.unmodifiableObservableList(results));
     private ReadOnlyBooleanWrapper searching = new ReadOnlyBooleanWrapper();
     private ReadOnlyObjectWrapper<Path> searchingDirectory = new ReadOnlyObjectWrapper<>();
-    private volatile boolean isCancelled = false;
+    private volatile boolean cancelled = false;
 
     public ReadOnlyObjectProperty<ObservableList<Path>> resultsProperty() {
         return readOnlyResults.getReadOnlyProperty();
@@ -95,7 +95,7 @@ public class Searcher implements AutoCloseable {
         PathMatcher pathMatcher = condition.getPathMatcher();
         results.clear();
         setSearching(true);
-        isCancelled = false;
+        cancelled = false;
 
         FileVisitor<Path> visitor = new FileVisitor<>() {
             @Override
@@ -123,7 +123,7 @@ public class Searcher implements AutoCloseable {
                 if (exc != null) {
                     logger.log(Level.WARNING, exc.getMessage(), exc);
                 }
-                return isCancelled ? FileVisitResult.TERMINATE : FileVisitResult.CONTINUE;
+                return cancelled ? FileVisitResult.TERMINATE : FileVisitResult.CONTINUE;
             }
         };
 
@@ -148,7 +148,7 @@ public class Searcher implements AutoCloseable {
     }
 
     public void cancel() {
-        isCancelled = true;
+        cancelled = true;
     }
 
     public void clear() {
