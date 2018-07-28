@@ -8,7 +8,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,12 +91,12 @@ public class Searcher implements AutoCloseable {
             throw new FileNotFoundException(String.valueOf(condition.getDirectory()));
         }
 
-        PathMatcher pathMatcher = condition.getPathMatcher();
+        var pathMatcher = condition.getPathMatcher();
         results.clear();
         setSearching(true);
         cancelled = false;
 
-        FileVisitor<Path> visitor = new FileVisitor<>() {
+        var visitor = new FileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 Platform.runLater(() -> setSearchingDirectory(dir));
@@ -156,10 +155,10 @@ public class Searcher implements AutoCloseable {
     }
 
     public RemoveResult moveToTrash(Collection<Path> files) {
-        ArrayList<Path> deletedFiles = new ArrayList<>();
-        ArrayList<Path> errorFiles = new ArrayList<>();
+        var deletedFiles = new ArrayList<Path>();
+        var errorFiles = new ArrayList<Path>();
 
-        Desktop desktop = Desktop.getDesktop();
+        var desktop = Desktop.getDesktop();
         files.stream().filter(results::contains).forEach(file -> {
             if (desktop.moveToTrash(file.toFile())) {
                 deletedFiles.add(file);
@@ -173,8 +172,8 @@ public class Searcher implements AutoCloseable {
     }
 
     public RemoveResult delete(Collection<Path> files) {
-        ArrayList<Path> deletedFiles = new ArrayList<>();
-        ArrayList<Path> errorFiles = new ArrayList<>();
+        var deletedFiles = new ArrayList<Path>();
+        var errorFiles = new ArrayList<Path>();
 
         files.stream().filter(results::contains).forEach(file -> {
             try {

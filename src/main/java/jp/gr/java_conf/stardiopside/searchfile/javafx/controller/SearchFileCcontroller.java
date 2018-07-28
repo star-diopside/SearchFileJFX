@@ -4,7 +4,6 @@ import java.awt.Desktop;
 import java.awt.Desktop.Action;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -28,7 +27,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -141,11 +139,11 @@ public class SearchFileCcontroller implements Initializable {
 
     @FXML
     private void onChooseDirectory(ActionEvent e) {
-        DirectoryChooser chooser = new DirectoryChooser();
+        var chooser = new DirectoryChooser();
         if (condition.getDirectory() != null && Files.isDirectory(condition.getDirectory())) {
             chooser.setInitialDirectory(condition.getDirectory().toFile());
         }
-        File dir = chooser.showDialog(stage);
+        var dir = chooser.showDialog(stage);
         if (dir != null) {
             condition.setDirectory(dir.toPath());
         }
@@ -161,13 +159,13 @@ public class SearchFileCcontroller implements Initializable {
             }
         } catch (FileNotFoundException exc) {
             logger.log(Level.FINE, exc.getMessage(), exc);
-            Alert alert = new Alert(AlertType.WARNING);
+            var alert = new Alert(AlertType.WARNING);
             alert.setHeaderText(null);
             alert.setContentText(messages.getMessage("message.directoryNotFound"));
             alert.showAndWait();
         } catch (PatternSyntaxException exc) {
             logger.log(Level.FINE, exc.getMessage(), exc);
-            Alert alert = new Alert(AlertType.WARNING);
+            var alert = new Alert(AlertType.WARNING);
             alert.setHeaderText(messages.getMessage("message.searchConditionError"));
             alert.setContentText(exc.getMessage());
             alert.showAndWait();
@@ -187,7 +185,7 @@ public class SearchFileCcontroller implements Initializable {
 
     @FXML
     private void onClearResults(ActionEvent e) {
-        Alert alert = new Alert(AlertType.CONFIRMATION, messages.getMessage("message.clearResultsConfirmation"),
+        var alert = new Alert(AlertType.CONFIRMATION, messages.getMessage("message.clearResultsConfirmation"),
                 ButtonType.OK, ButtonType.CANCEL);
         alert.setHeaderText(null);
         alert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> {
@@ -208,10 +206,10 @@ public class SearchFileCcontroller implements Initializable {
 
     @FXML
     private void onDeleteSelectedFile(ActionEvent e) {
-        String messageKey = checkMoveToTrash.isSelected() ? "message.deleteSelectedFileConfirmation.moveToTrash"
+        var messageKey = checkMoveToTrash.isSelected() ? "message.deleteSelectedFileConfirmation.moveToTrash"
                 : "message.deleteSelectedFileConfirmation.delete";
-        ObservableList<Path> selectedFiles = foundFiles.getSelectionModel().getSelectedItems();
-        Alert alert = new Alert(AlertType.CONFIRMATION,
+        var selectedFiles = foundFiles.getSelectionModel().getSelectedItems();
+        var alert = new Alert(AlertType.CONFIRMATION,
                 messages.getMessage(messageKey, new Object[] { selectedFiles.size() }), ButtonType.OK,
                 ButtonType.CANCEL);
         alert.setHeaderText(null);
@@ -223,7 +221,7 @@ public class SearchFileCcontroller implements Initializable {
                 result = searcher.delete(selectedFiles);
             }
 
-            String resultMessage = messages.getMessage("message.deleteSelectedFile.success",
+            var resultMessage = messages.getMessage("message.deleteSelectedFile.success",
                     new Object[] { result.getDeletedFiles().size() });
             if (!result.getErrorFiles().isEmpty()) {
                 resultMessage += messages.getMessage("message.deleteSelectedFile.error",
@@ -235,9 +233,9 @@ public class SearchFileCcontroller implements Initializable {
 
     @FXML
     private void onCopyResults(ActionEvent e) {
-        String result = searcher.getResults().stream().map(Path::toString)
+        var result = searcher.getResults().stream().map(Path::toString)
                 .collect(Collectors.joining(System.lineSeparator(), "", System.lineSeparator()));
-        StringSelection selection = new StringSelection(result);
+        var selection = new StringSelection(result);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
         statusProperty.set(messages.getMessage("message.copyResults", new Object[] { searcher.getResults().size() }));
     }

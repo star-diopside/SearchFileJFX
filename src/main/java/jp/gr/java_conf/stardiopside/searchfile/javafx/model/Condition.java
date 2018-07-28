@@ -56,7 +56,7 @@ public class Condition {
     }
 
     public PathMatcher getPathMatcher() {
-        String pattern = getFilePattern();
+        var pattern = getFilePattern();
         if (pattern == null || pattern.isEmpty()) {
             return path -> true;
         } else {

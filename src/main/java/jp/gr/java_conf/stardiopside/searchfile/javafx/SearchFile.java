@@ -34,17 +34,16 @@ public class SearchFile extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        ResourceBundle messages = ResourceBundle.getBundle("messages");
+        var messages = ResourceBundle.getBundle("messages");
 
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
             logger.log(Level.SEVERE, e.getMessage(), e);
-            ExceptionDialog dialog = new ExceptionDialog(e);
+            var dialog = new ExceptionDialog(e);
             dialog.setHeaderText(messages.getString("message.uncaughtException"));
             dialog.show();
         });
 
-        FXMLLoader loader = new FXMLLoader(applicationContext.getResource("classpath:SearchFile.fxml").getURL(),
-                messages);
+        var loader = new FXMLLoader(applicationContext.getResource("classpath:SearchFile.fxml").getURL(), messages);
         loader.setControllerFactory(applicationContext::getBean);
         Parent parent = loader.load();
         SearchFileCcontroller controller = loader.getController();
