@@ -25,7 +25,9 @@ import org.springframework.stereotype.Component;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -56,6 +58,8 @@ public class SearchFileCcontroller implements Initializable {
     private final Searcher searcher;
     private final MessageSourceAccessor messages;
     private final StringProperty statusProperty = new SimpleStringProperty();
+    private ChangeListener<Boolean> showingChangeListener;
+    private ChangeListener<Path> searchingDirectoryChangeListener;
 
     private Stage stage;
 
@@ -97,11 +101,12 @@ public class SearchFileCcontroller implements Initializable {
 
     public void setStage(Stage stage) {
         this.stage = stage;
-        stage.showingProperty().addListener((observable, oldValue, newValue) -> {
+        showingChangeListener = (observable, oldValue, newValue) -> {
             if (oldValue.booleanValue() && !newValue.booleanValue()) {
                 searcher.close();
             }
-        });
+        };
+        stage.showingProperty().addListener(new WeakChangeListener<>(showingChangeListener));
     }
 
     @Override
@@ -119,7 +124,8 @@ public class SearchFileCcontroller implements Initializable {
         buttonSearch.defaultButtonProperty().bind(textDirectory.focusedProperty().not());
         buttonClearResults.disableProperty().bind(searcher.searchingProperty());
         statusBar.textProperty().bind(statusProperty);
-        searcher.searchingDirectoryProperty().addListener(this::changedSearchingDirectory);
+        searchingDirectoryChangeListener = this::changedSearchingDirectory;
+        searcher.searchingDirectoryProperty().addListener(new WeakChangeListener<>(searchingDirectoryChangeListener));
         osName.setText(System.getProperty("os.name"));
 
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Action.MOVE_TO_TRASH)) {
