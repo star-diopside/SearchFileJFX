@@ -128,7 +128,7 @@ public class Searcher implements AutoCloseable {
 
         executorService.submit(new FutureTask<>(() -> {
             try {
-                Files.walkFileTree(condition.getDirectory(), visitor);
+                Files.walkFileTree(condition.getDirectory().toAbsolutePath().normalize(), visitor);
             } catch (IOException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
                 throw new UncheckedIOException(e);
