@@ -1,11 +1,20 @@
 plugins {
-    id "org.springframework.boot" version "2.0.3.RELEASE"
+    id "org.springframework.boot" version "2.0.6.RELEASE"
+    id "com.google.osdetector" version "1.4.0"
+    //id "com.google.osdetector" version "1.6.0"
 }
 
 apply plugin: "java-library"
 apply plugin: "io.spring.dependency-management"
+apply plugin: "com.google.osdetector"
 
 group = "jp.gr.java_conf.stardiopside.searchfile.javafx"
+
+ext {
+    javafxVersion = "11"
+    controlsfxVersion = "9.0.0"
+    platform = osdetector.os == "osx" ? "mac" : osdetector.os == "windows" ? "win" : osdetector.os
+}
 
 repositories {
     jcenter()
@@ -17,5 +26,13 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter"
-    implementation "org.controlsfx:controlsfx:9.0.0"
+    implementation "org.openjfx:javafx-base:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-fxml:${javafxVersion}:${platform}"
+    implementation "org.controlsfx:controlsfx:${controlsfxVersion}"
+}
+
+bootJar {
+    classifier = "${platform}"
 }
