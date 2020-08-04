@@ -19,6 +19,7 @@ import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -39,18 +40,18 @@ public class Searcher implements AutoCloseable {
 
     private static final Logger logger = Logger.getLogger(Searcher.class.getName());
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private ObservableList<Path> results = FXCollections.observableArrayList();
-    private ReadOnlyObjectWrapper<SortedList<Path>> sortedResults = new ReadOnlyObjectWrapper<>(
+    private ObservableList<Result> results = FXCollections.observableArrayList();
+    private ReadOnlyObjectWrapper<SortedList<Result>> sortedResults = new ReadOnlyObjectWrapper<>(
             new SortedList<>(results));
     private ReadOnlyBooleanWrapper searching = new ReadOnlyBooleanWrapper();
     private ReadOnlyObjectWrapper<Path> searchingDirectory = new ReadOnlyObjectWrapper<>();
     private volatile boolean cancelled = false;
 
-    public ReadOnlyObjectProperty<SortedList<Path>> resultsProperty() {
+    public ReadOnlyObjectProperty<SortedList<Result>> resultsProperty() {
         return sortedResults.getReadOnlyProperty();
     }
 
-    public SortedList<Path> getResults() {
+    public SortedList<Result> getResults() {
         return sortedResults.get();
     }
 
@@ -107,7 +108,7 @@ public class Searcher implements AutoCloseable {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 if (pathMatcher.matches(file.getFileName())) {
-                    Platform.runLater(() -> results.add(file));
+                    Platform.runLater(() -> results.add(new Result(file)));
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -160,7 +161,9 @@ public class Searcher implements AutoCloseable {
         var errorFiles = new ArrayList<Path>();
 
         var desktop = Desktop.getDesktop();
-        files.stream().filter(results::contains).forEach(file -> {
+        var targetFiles = results.stream().map(Result::getPath).collect(Collectors.toSet());
+        targetFiles.retainAll(files);
+        targetFiles.forEach(file -> {
             if (desktop.moveToTrash(file.toFile())) {
                 deletedFiles.add(file);
             } else {
@@ -168,7 +171,7 @@ public class Searcher implements AutoCloseable {
             }
         });
 
-        results.removeAll(deletedFiles);
+        results.removeIf(result -> deletedFiles.contains(result.getPath()));
         return new RemoveResult(deletedFiles, errorFiles);
     }
 
@@ -176,7 +179,9 @@ public class Searcher implements AutoCloseable {
         var deletedFiles = new ArrayList<Path>();
         var errorFiles = new ArrayList<Path>();
 
-        files.stream().filter(results::contains).forEach(file -> {
+        var targetFiles = results.stream().map(Result::getPath).collect(Collectors.toSet());
+        targetFiles.retainAll(files);
+        targetFiles.forEach(file -> {
             try {
                 Files.delete(file);
                 deletedFiles.add(file);
@@ -186,7 +191,7 @@ public class Searcher implements AutoCloseable {
             }
         });
 
-        results.removeAll(deletedFiles);
+        results.removeIf(result -> deletedFiles.contains(result.getPath()));
         return new RemoveResult(deletedFiles, errorFiles);
     }
 

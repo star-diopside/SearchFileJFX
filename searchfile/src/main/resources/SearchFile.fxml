@@ -52,6 +52,7 @@
                 <TableView fx:id="foundFiles">
                     <columns>
                         <TableColumn fx:id="foundFileName" prefWidth="200.0" text="%SearchFile.foundFiles.fileName.text" />
+                        <TableColumn fx:id="foundFileExtension" text="%SearchFile.foundFiles.extension.text" />
                         <TableColumn fx:id="foundFileDirectory" prefWidth="500.0" text="%SearchFile.foundFiles.directoryName.text" />
                     </columns>
                 </TableView>

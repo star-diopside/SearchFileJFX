@@ -22,7 +22,6 @@ import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -45,6 +44,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import jp.gr.java_conf.stardiopside.searchfile.javafx.model.Condition;
+import jp.gr.java_conf.stardiopside.searchfile.javafx.model.Result;
 import jp.gr.java_conf.stardiopside.searchfile.javafx.model.Searcher;
 import jp.gr.java_conf.stardiopside.searchfile.javafx.model.Searcher.RemoveResult;
 import jp.gr.java_conf.stardiopside.searchfile.javafx.util.PathStringConverter;
@@ -85,13 +85,16 @@ public class SearchFileCcontroller implements Initializable {
     private CheckBox checkMoveToTrash;
 
     @FXML
-    private TableView<Path> foundFiles;
+    private TableView<Result> foundFiles;
 
     @FXML
-    private TableColumn<Path, Path> foundFileName;
+    private TableColumn<Result, Path> foundFileName;
 
     @FXML
-    private TableColumn<Path, Path> foundFileDirectory;
+    private TableColumn<Result, String> foundFileExtension;
+
+    @FXML
+    private TableColumn<Result, Path> foundFileDirectory;
 
     @FXML
     private StatusBar statusBar;
@@ -123,8 +126,9 @@ public class SearchFileCcontroller implements Initializable {
         condition.matchTypeProperty().bind(matchType.selectedToggleProperty());
         foundFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         foundFiles.itemsProperty().bind(searcher.resultsProperty());
-        foundFileName.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getFileName()));
-        foundFileDirectory.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getParent()));
+        foundFileName.setCellValueFactory(param -> param.getValue().fileNameBinding());
+        foundFileExtension.setCellValueFactory(param -> param.getValue().extensionBinding());
+        foundFileDirectory.setCellValueFactory(param -> param.getValue().directoryNameBinding());
         buttonDirectory.defaultButtonProperty().bind(textDirectory.focusedProperty());
         buttonSearch.textProperty().bind(Bindings.createStringBinding(() -> messages.getMessage(
                 searcher.isSearching() ? "SearchFile.buttonSearch.text.stop" : "SearchFile.buttonSearch.text.start"),
@@ -219,7 +223,8 @@ public class SearchFileCcontroller implements Initializable {
     private void onDeleteSelectedFile(ActionEvent e) {
         var messageKey = checkMoveToTrash.isSelected() ? "message.deleteSelectedFileConfirmation.moveToTrash"
                 : "message.deleteSelectedFileConfirmation.delete";
-        var selectedFiles = foundFiles.getSelectionModel().getSelectedItems();
+        var selectedFiles = foundFiles.getSelectionModel().getSelectedItems().stream().map(Result::getPath)
+                .collect(Collectors.toSet());
         var alert = new Alert(AlertType.CONFIRMATION,
                 messages.getMessage(messageKey, new Object[] { selectedFiles.size() }), ButtonType.OK,
                 ButtonType.CANCEL);
@@ -244,7 +249,7 @@ public class SearchFileCcontroller implements Initializable {
 
     @FXML
     private void onCopyResults(ActionEvent e) {
-        var result = searcher.getResults().stream().map(Path::toString)
+        var result = searcher.getResults().stream().map(Result::getPath).map(Path::toString)
                 .collect(Collectors.joining(System.lineSeparator(), "", System.lineSeparator()));
         var selection = new StringSelection(result);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
