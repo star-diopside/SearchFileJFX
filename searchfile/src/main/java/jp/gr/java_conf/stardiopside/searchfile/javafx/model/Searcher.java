@@ -31,6 +31,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -39,18 +40,18 @@ public class Searcher implements AutoCloseable {
     private static final Logger logger = Logger.getLogger(Searcher.class.getName());
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private ObservableList<Path> results = FXCollections.observableArrayList();
-    private ReadOnlyObjectWrapper<ObservableList<Path>> readOnlyResults = new ReadOnlyObjectWrapper<>(
-            FXCollections.unmodifiableObservableList(results));
+    private ReadOnlyObjectWrapper<SortedList<Path>> sortedResults = new ReadOnlyObjectWrapper<>(
+            new SortedList<>(results));
     private ReadOnlyBooleanWrapper searching = new ReadOnlyBooleanWrapper();
     private ReadOnlyObjectWrapper<Path> searchingDirectory = new ReadOnlyObjectWrapper<>();
     private volatile boolean cancelled = false;
 
-    public ReadOnlyObjectProperty<ObservableList<Path>> resultsProperty() {
-        return readOnlyResults.getReadOnlyProperty();
+    public ReadOnlyObjectProperty<SortedList<Path>> resultsProperty() {
+        return sortedResults.getReadOnlyProperty();
     }
 
-    public ObservableList<Path> getResults() {
-        return readOnlyResults.get();
+    public SortedList<Path> getResults() {
+        return sortedResults.get();
     }
 
     public ReadOnlyBooleanProperty searchingProperty() {

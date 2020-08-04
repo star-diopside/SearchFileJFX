@@ -22,6 +22,7 @@ import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -36,8 +37,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.DirectoryChooser;
@@ -83,7 +85,13 @@ public class SearchFileCcontroller implements Initializable {
     private CheckBox checkMoveToTrash;
 
     @FXML
-    private ListView<Path> foundFiles;
+    private TableView<Path> foundFiles;
+
+    @FXML
+    private TableColumn<Path, Path> foundFileName;
+
+    @FXML
+    private TableColumn<Path, Path> foundFileDirectory;
 
     @FXML
     private StatusBar statusBar;
@@ -115,6 +123,8 @@ public class SearchFileCcontroller implements Initializable {
         condition.matchTypeProperty().bind(matchType.selectedToggleProperty());
         foundFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         foundFiles.itemsProperty().bind(searcher.resultsProperty());
+        foundFileName.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getFileName()));
+        foundFileDirectory.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getParent()));
         buttonDirectory.defaultButtonProperty().bind(textDirectory.focusedProperty());
         buttonSearch.textProperty().bind(Bindings.createStringBinding(() -> messages.getMessage(
                 searcher.isSearching() ? "SearchFile.buttonSearch.text.stop" : "SearchFile.buttonSearch.text.start"),
@@ -124,6 +134,7 @@ public class SearchFileCcontroller implements Initializable {
         statusBar.textProperty().bind(statusProperty);
         searchingDirectoryChangeListener = this::changedSearchingDirectory;
         searcher.searchingDirectoryProperty().addListener(new WeakChangeListener<>(searchingDirectoryChangeListener));
+        searcher.getResults().comparatorProperty().bind(foundFiles.comparatorProperty());
         osName.setText(System.getProperty("os.name"));
 
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Action.MOVE_TO_TRASH)) {

@@ -1,1 +1,4 @@
 rootProject.name = "SearchFileJFX"
+
+include ":searchfile"
+include ":searchfile-boot"

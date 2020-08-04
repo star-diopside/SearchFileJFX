@@ -1,38 +1,59 @@
 plugins {
-    id "org.springframework.boot" version "2.0.6.RELEASE"
-    id "com.google.osdetector" version "1.4.0"
-    //id "com.google.osdetector" version "1.6.0"
+    id "org.springframework.boot" version "2.3.2.RELEASE" apply false
+    id "org.openjfx.javafxplugin" version "0.0.9" apply false
 }
 
-apply plugin: "java-library"
-apply plugin: "io.spring.dependency-management"
-apply plugin: "com.google.osdetector"
+subprojects {
+    apply plugin: "java"
+    apply plugin: "io.spring.dependency-management"
 
-group = "jp.gr.java_conf.stardiopside.searchfile.javafx"
+    group = "jp.gr.java_conf.stardiopside.searchfile.javafx"
 
-ext {
-    javafxVersion = "11"
-    controlsfxVersion = "9.0.0"
-    platform = osdetector.os == "osx" ? "mac" : osdetector.os == "windows" ? "win" : osdetector.os
+    ext {
+        javafxVersion = "14.0.2.1"
+        controlsfxVersion = "11.0.2"
+    }
+
+    repositories {
+        jcenter()
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
 }
 
-repositories {
-    jcenter()
+project(":searchfile") {
+    apply plugin: "org.openjfx.javafxplugin"
+    apply plugin: "application"
+
+    mainClassName = "jp.gr.java_conf.stardiopside.searchfile.javafx.SearchFile"
+
+    javafx {
+        version = javafxVersion
+        modules = [ "javafx.controls", "javafx.fxml" ]
+    }
+
+    dependencies {
+        implementation "org.springframework.boot:spring-boot-starter"
+        implementation "org.controlsfx:controlsfx:${controlsfxVersion}"
+    }
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
+project(":searchfile-boot") {
+    apply plugin: "org.springframework.boot"
 
-dependencies {
-    implementation "org.springframework.boot:spring-boot-starter"
-    implementation "org.openjfx:javafx-base:${javafxVersion}:${platform}"
-    implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
-    implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
-    implementation "org.openjfx:javafx-fxml:${javafxVersion}:${platform}"
-    implementation "org.controlsfx:controlsfx:${controlsfxVersion}"
-}
+    bootJar {
+        mainClassName = "jp.gr.java_conf.stardiopside.searchfile.javafx.SearchFile"
+    }
 
-bootJar {
-    classifier = "${platform}"
+    dependencies {
+        runtimeOnly project(":searchfile")
+    }
 }
