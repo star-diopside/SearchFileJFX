@@ -129,6 +129,16 @@ public class SearchFileCcontroller implements Initializable {
         foundFileName.setCellValueFactory(param -> param.getValue().fileNameBinding());
         foundFileExtension.setCellValueFactory(param -> param.getValue().extensionBinding());
         foundFileDirectory.setCellValueFactory(param -> param.getValue().directoryNameBinding());
+        foundFileDirectory.setComparator((a, b) -> {
+            int count = Math.min(a.getNameCount(), b.getNameCount());
+            for (int i = 0; i < count; i++) {
+                int c = a.getName(i).compareTo(b.getName(i));
+                if (c != 0) {
+                    return c;
+                }
+            }
+            return a.compareTo(b);
+        });
         buttonDirectory.defaultButtonProperty().bind(textDirectory.focusedProperty());
         buttonSearch.textProperty().bind(Bindings.createStringBinding(() -> messages.getMessage(
                 searcher.isSearching() ? "SearchFile.buttonSearch.text.stop" : "SearchFile.buttonSearch.text.start"),
