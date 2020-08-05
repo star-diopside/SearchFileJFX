@@ -14,7 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import jp.gr.java_conf.stardiopside.searchfile.javafx.controller.SearchFileCcontroller;
+import jp.gr.java_conf.stardiopside.searchfile.javafx.controller.SearchFileController;
 
 @SpringBootApplication
 public class SearchFile extends Application {
@@ -46,7 +46,7 @@ public class SearchFile extends Application {
         var loader = new FXMLLoader(applicationContext.getResource("classpath:SearchFile.fxml").getURL(), messages);
         loader.setControllerFactory(applicationContext::getBean);
         Parent parent = loader.load();
-        SearchFileCcontroller controller = loader.getController();
+        SearchFileController controller = loader.getController();
         controller.setStage(primaryStage);
         primaryStage.setScene(new Scene(parent));
         primaryStage.setTitle(messages.getString("SearchFile.title"));

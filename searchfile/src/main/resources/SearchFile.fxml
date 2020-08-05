@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.StatusBar?>
 
-<BorderPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jp.gr.java_conf.stardiopside.searchfile.javafx.controller.SearchFileCcontroller">
+<BorderPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jp.gr.java_conf.stardiopside.searchfile.javafx.controller.SearchFileController">
     <top>
         <MenuBar>
             <menus>

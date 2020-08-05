@@ -51,9 +51,9 @@ import jp.gr.java_conf.stardiopside.searchfile.javafx.util.PathStringConverter;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SearchFileCcontroller implements Initializable {
+public class SearchFileController implements Initializable {
 
-    private static final Logger logger = Logger.getLogger(SearchFileCcontroller.class.getName());
+    private static final Logger logger = Logger.getLogger(SearchFileController.class.getName());
     private final Condition condition;
     private final Searcher searcher;
     private final MessageSourceAccessor messages;
@@ -102,7 +102,7 @@ public class SearchFileCcontroller implements Initializable {
     @FXML
     private Label osName;
 
-    public SearchFileCcontroller(Condition condition, Searcher searcher, MessageSource messageSource) {
+    public SearchFileController(Condition condition, Searcher searcher, MessageSource messageSource) {
         this.condition = condition;
         this.searcher = searcher;
         this.messages = new MessageSourceAccessor(messageSource);
